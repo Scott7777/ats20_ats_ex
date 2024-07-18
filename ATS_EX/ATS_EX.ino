@@ -65,6 +65,11 @@ int getLastStep()
 //Initialize controller
 void setup()
 {
+  #ifdef DEBUG
+    Serial.begin(9600);
+  #endif
+
+  #ifndef DEBUG
     //We need to save more space with this
     DDRB |=  (1 << DDB5);   //13 pin
     DDRD &= ~(1 << ENCODER_PIN_A);
@@ -72,6 +77,7 @@ void setup()
     DDRD &= ~(1 << ENCODER_PIN_B);
     PORTD |= (1 << ENCODER_PIN_B);
     g_voltagePinConnnected = analogRead(BATTERY_VOLTAGE_PIN) > 300;
+  #endif
 
     oled.begin(128, 64, sizeof(tiny4koled_init_128x64br), tiny4koled_init_128x64br);
     oled.clear();
@@ -461,7 +467,9 @@ void showStatus(bool cleanFreq)
     showModulation();
     showStep();
     showBandwidth();
+    #ifndef DEBUG
     showCharge(true);
+    #endif
     showVolume();
 }
 
@@ -470,7 +478,9 @@ void updateLowerDisplayLine()
     oledPrint(_literal_EmptyLine, 0, 6, DEFAULT_FONT);
     showModulation();
     showStep();
+    #ifndef DEBUG
     showCharge(true);
+    #endif
 }
 
 //Converts settings value to UI value
@@ -712,6 +722,7 @@ void showVolume()
 //This feature requires hardware mod
 //Voltage divider made of two 10 KOhm resistors between + and GND of Li-Ion battery
 //Solder it to A2 analog pin
+#ifndef DEBUG
 void showCharge(bool forceShow)
 {
     if (!g_voltagePinConnnected)
@@ -784,6 +795,7 @@ void showCharge(bool forceShow)
 
     averageSamples = (averageSamples + sample) / 2;
 }
+#endif
 
 #if USE_RDS
 void showRDS()
@@ -1021,6 +1033,10 @@ void bandSwitch(bool up)
             updateBFO();
         applyBandConfiguration();
     }
+#ifdef DEBUG
+  Serial.print("g_bandIndex: ");
+  Serial.println(g_bandIndex);
+#endif
 }
 
 // This function is required for using SSB. Si473x controllers do not support SSB by-default.
@@ -1612,7 +1628,9 @@ void loop()
         if (g_sMeterOn && !g_settingsActive)
             showSMeter();
 
+        #ifndef DEBUG
         showCharge(false);
+        #endif
     }
 
     if (g_lastAdjustmentTime != 0 && millis() - g_lastAdjustmentTime > ADJUSTMENT_ACTIVE_TIMEOUT)
