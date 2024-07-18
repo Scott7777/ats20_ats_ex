@@ -65,11 +65,11 @@ int getLastStep()
 //Initialize controller
 void setup()
 {
-  #ifdef DEBUG
-    Serial.begin(9600);
-  #endif
+//  #ifdef DEBUG
+//    Serial.begin(9600);
+//  #endif
 
-  #ifndef DEBUG
+//  #ifndef DEBUG
     //We need to save more space with this
     DDRB |=  (1 << DDB5);   //13 pin
     DDRD &= ~(1 << ENCODER_PIN_A);
@@ -77,7 +77,7 @@ void setup()
     DDRD &= ~(1 << ENCODER_PIN_B);
     PORTD |= (1 << ENCODER_PIN_B);
     g_voltagePinConnnected = analogRead(BATTERY_VOLTAGE_PIN) > 300;
-  #endif
+//  #endif
 
     oled.begin(128, 64, sizeof(tiny4koled_init_128x64br), tiny4koled_init_128x64br);
     oled.clear();
@@ -307,7 +307,7 @@ void readAllReceiverInformation()
     oled.setContrast(uint8_t(g_Settings[SettingsIndex::Brightness].param) * 2);
 
     g_previousFrequency = g_currentFrequency = g_bandList[g_bandIndex].currentFreq;
-    if (g_bandIndex == FM_BAND_TYPE)
+    if (g_bandList[g_bandIndex].bandType == FM_BAND_TYPE)
         g_FMStepIndex = g_bandList[g_bandIndex].currentStepIdx;
     else
         g_stepIndex = g_bandList[g_bandIndex].currentStepIdx;
@@ -367,21 +367,21 @@ void showFrequency(bool cleanDisplay = false)
     ssbSuffix[2] = '0';
     ssbSuffix[3] = '\0';
 
-    if (g_bandIndex == FM_BAND_TYPE)
+    if (g_bandList[g_bandIndex].bandType == FM_BAND_TYPE)
     {
         convertToChar(freqDisplay, g_currentFrequency, 5, 3, '.', '/');
         unit[0] = 'M';
     }
     else
     {
-        if (g_bandIndex == SW_BAND_TYPE)
+        if (g_bandList[g_bandIndex].bandType == SW_BAND_TYPE)
             showBandTag();
 
         if (!isSSB())
         {
             bool swMhz = g_Settings[SettingsIndex::SWUnits].param == 1;
-            convertToChar(freqDisplay, g_currentFrequency, 5, (g_bandIndex == SW_BAND_TYPE && swMhz) ? 2 : 0, '.', '/');
-            if (g_bandIndex == SW_BAND_TYPE && swMhz)
+            convertToChar(freqDisplay, g_currentFrequency, 5, (g_bandList[g_bandIndex].bandType == SW_BAND_TYPE && swMhz) ? 2 : 0, '.', '/');
+            if (g_bandList[g_bandIndex].bandType == SW_BAND_TYPE && swMhz)
                 unit[0] = 'M';
         }
         else
@@ -467,9 +467,9 @@ void showStatus(bool cleanFreq)
     showModulation();
     showStep();
     showBandwidth();
-    #ifndef DEBUG
+//    #ifndef DEBUG
     showCharge(true);
-    #endif
+//    #endif
     showVolume();
 }
 
@@ -478,9 +478,9 @@ void updateLowerDisplayLine()
     oledPrint(_literal_EmptyLine, 0, 6, DEFAULT_FONT);
     showModulation();
     showStep();
-    #ifndef DEBUG
+//    #ifndef DEBUG
     showCharge(true);
-    #endif
+//    #endif
 }
 
 //Converts settings value to UI value
@@ -696,7 +696,7 @@ void showBandTag()
     if (g_sMeterOn || g_displayRDS)
         return;
 
-    oledPrint((g_currentFrequency >= CB_LIMIT_LOW && g_currentFrequency < CB_LIMIT_HIGH)? "CB" : bandTags[g_bandIndex], 0, 6, DEFAULT_FONT, g_cmdBand && g_currentMode != FM);
+    oledPrint((g_currentFrequency >= CB_LIMIT_LOW && g_currentFrequency < CB_LIMIT_HIGH)? "CB" : g_bandList[g_bandIndex].bandTag, 0, 6, DEFAULT_FONT, g_cmdBand && g_currentMode != FM);
 }
 
 //Draw volume level
@@ -722,7 +722,7 @@ void showVolume()
 //This feature requires hardware mod
 //Voltage divider made of two 10 KOhm resistors between + and GND of Li-Ion battery
 //Solder it to A2 analog pin
-#ifndef DEBUG
+//#ifndef DEBUG
 void showCharge(bool forceShow)
 {
     if (!g_voltagePinConnnected)
@@ -795,7 +795,7 @@ void showCharge(bool forceShow)
 
     averageSamples = (averageSamples + sample) / 2;
 }
-#endif
+//#endif
 
 #if USE_RDS
 void showRDS()
@@ -958,29 +958,33 @@ void showBandwidth()
     oledPrint(bw, 45, 0, DEFAULT_FONT, g_cmdBw);
 }
 
-uint16_t getNextSWSuBband(bool up)
-{
-    uint16_t freq = g_currentFrequency;
-    if (isSSB())
-        freq += g_currentBFO / 1000;
+// uint16_t getNextSWSuBband(bool up)
+// {
+//     uint16_t freq = g_currentFrequency;
+//     if (isSSB())
+//         freq += g_currentBFO / 1000;
 
-    for (uint8_t i = 0; i < g_SWSubBandCount; i++)
-    {
-        uint8_t n = g_SWSubBandCount - 1 - i;
-        if (!up && SWSubBands[n] < freq)
-            return SWSubBands[n];
-        else if (up && SWSubBands[i] > freq)
-            return SWSubBands[i];
-    }
+//     for (uint8_t i = 0; i < g_SWSubBandCount; i++)
+//     {
+//         uint8_t n = g_SWSubBandCount - 1 - i;
+//         if (!up && SWSubBands[n] < freq)
+//             return SWSubBands[n];
+//         else if (up && SWSubBands[i] > freq)
+//             return SWSubBands[i];
+//     }
 
-    return 0;
-}
+//     return 0;
+// }
 
 void bandSwitch(bool up)
 {
-    uint16_t nextSW = getNextSWSuBband(up);
-    
-    if (g_bandIndex == SW_BAND_TYPE && nextSW != 0)
+//    uint16_t nextSW = getNextSWSuBband(up);
+      uint16_t nextSW = 0;
+//#ifdef DEBUG
+//  Serial.print("nextSW: ");
+//  Serial.println(nextSW);
+//#endif    
+    if (g_bandList[g_bandIndex].bandType == SW_BAND_TYPE && nextSW != 0)
     {
         g_currentFrequency = nextSW;
 
@@ -1033,10 +1037,10 @@ void bandSwitch(bool up)
             updateBFO();
         applyBandConfiguration();
     }
-#ifdef DEBUG
-  Serial.print("g_bandIndex: ");
-  Serial.println(g_bandIndex);
-#endif
+//#ifdef DEBUG
+//  Serial.print("g_bandIndex: ");
+//  Serial.println(g_bandIndex);
+//#endif
 }
 
 // This function is required for using SSB. Si473x controllers do not support SSB by-default.
@@ -1067,8 +1071,8 @@ void setRDSConfig(uint8_t bias)
 //Update receiver settings after changing band and modulation
 void applyBandConfiguration(bool extraSSBReset = false)
 {
-    g_si4735.setTuneFrequencyAntennaCapacitor(uint16_t(g_bandIndex == SW_BAND_TYPE));
-    if (g_bandIndex == FM_BAND_TYPE)
+    g_si4735.setTuneFrequencyAntennaCapacitor(uint16_t(g_bandList[g_bandIndex].bandType == SW_BAND_TYPE));
+    if (g_bandList[g_bandIndex].bandType == FM_BAND_TYPE)
     {
         g_currentMode = FM;
         g_si4735.setFM(g_bandList[g_bandIndex].minimumFreq,
@@ -1090,11 +1094,11 @@ void applyBandConfiguration(bool extraSSBReset = false)
     {
         uint16_t minFreq = g_bandList[g_bandIndex].minimumFreq;
         uint16_t maxFreq = g_bandList[g_bandIndex].maximumFreq;
-        if (g_bandIndex == SW_BAND_TYPE)
-        {
-            minFreq = SW_LIMIT_LOW;
-            maxFreq = SW_LIMIT_HIGH;
-        }
+        // if (g_bandList[g_bandIndex].bandType == SW_BAND_TYPE)
+        // {
+        //     minFreq = SW_LIMIT_LOW;
+        //     maxFreq = SW_LIMIT_HIGH;
+        // }
 
         if (g_ssbLoaded)
         {
@@ -1142,7 +1146,7 @@ void applyBandConfiguration(bool extraSSBReset = false)
     else
         g_stepIndex = g_bandList[g_bandIndex].currentStepIdx;
 
-    if ((g_bandIndex == LW_BAND_TYPE || g_bandIndex == MW_BAND_TYPE)
+    if ((g_bandList[g_bandIndex].bandType == LW_BAND_TYPE || g_bandList[g_bandIndex].bandType == MW_BAND_TYPE)
         && g_stepIndex > g_amTotalStepsSSB)
         g_stepIndex = g_amTotalStepsSSB;
 
@@ -1180,10 +1184,10 @@ void doStep(int8_t v)
             g_stepIndex = v == 1 ? g_amTotalSteps : g_amTotalStepsSSB - 1;
         
         //LW/MW Step limit
-        else if ((g_bandIndex == LW_BAND_TYPE || g_bandIndex == MW_BAND_TYPE)
+        else if ((g_bandList[g_bandIndex].bandType == LW_BAND_TYPE || g_bandList[g_bandIndex].bandType == MW_BAND_TYPE)
             && v == 1 && g_stepIndex > g_amTotalStepsSSB && g_stepIndex < g_amTotalSteps)
             g_stepIndex = g_amTotalSteps;
-        else if ((g_bandIndex == LW_BAND_TYPE || g_bandIndex == MW_BAND_TYPE)
+        else if ((g_bandList[g_bandIndex].bandType == LW_BAND_TYPE || g_bandList[g_bandIndex].bandType == MW_BAND_TYPE)
             && v != 1 && g_stepIndex > g_amTotalStepsSSB && g_stepIndex < g_amTotalSteps)
             g_stepIndex = g_amTotalStepsSSB;
 
@@ -1628,9 +1632,9 @@ void loop()
         if (g_sMeterOn && !g_settingsActive)
             showSMeter();
 
-        #ifndef DEBUG
+//        #ifndef DEBUG
         showCharge(false);
-        #endif
+//        #endif
     }
 
     if (g_lastAdjustmentTime != 0 && millis() - g_lastAdjustmentTime > ADJUSTMENT_ACTIVE_TIMEOUT)

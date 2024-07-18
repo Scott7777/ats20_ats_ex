@@ -1,14 +1,14 @@
 #pragma once
 
-#define DEBUG 1
+//#define DEBUG 0
 
 //If you set this def to 0 project will be compiled without RDS 
 //and everything related to RDS will be excluded from build
-#ifdef DEBUG
-  #define USE_RDS 0
-#else
+//#ifdef DEBUG
+//  #define USE_RDS 0
+//#else
   #define USE_RDS 1
-#endif
+//#endif
 
 #define EEPROM_APP_ID				235
 #define EEPROM_DATA_START_ADDRESS	1
@@ -51,7 +51,7 @@
 // Band settings
 #define SW_LIMIT_LOW		1710
 #define SW_LIMIT_HIGH		30000
-#define LW_LIMIT_LOW		153
+//#define LW_LIMIT_LOW		153
 #define CB_LIMIT_LOW		26200
 #define CB_LIMIT_HIGH		28000
 

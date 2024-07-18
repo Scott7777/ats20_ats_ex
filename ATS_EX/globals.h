@@ -211,11 +211,13 @@ enum BandType : uint8_t
 
 struct Band
 {
-    uint16_t minimumFreq;
-    uint16_t maximumFreq;
-    uint16_t currentFreq;
-    int8_t currentStepIdx;
-    int8_t bandwidthIdx;     // Bandwidth table index (internal table in Si473x controller)
+    const char* bandTag;
+    uint8_t bandType;         // Band type (FM, MW or SW)
+    uint16_t minimumFreq;     // Minimum frequency of the band
+    uint16_t maximumFreq;     // Maximum frequency of the band
+    uint16_t currentFreq;     // Default frequency or current frequency
+    int8_t currentStepIdx;    // Idex of tabStep:  Defeult frequency step (See tabStep)
+    int8_t bandwidthIdx;      // Bandwidth table index (internal table in Si473x controller)
 };
 
 #if USE_RDS
@@ -232,45 +234,47 @@ char* g_RDSCells[3];
 
 char _literal_EmptyLine[17] = "                ";
 
-char* bandTags[] =
-{
-    "LW",
-    "MW",
-    "SW",
-    "  ",    //It looks better
-};
+//char* bandTags[] =
+//{
+//    "LW",
+//    "MW",
+//    "SW",
+//    "  ",    //It looks better
+//};
 
 Band g_bandList[] =
 {
-    /* LW */ { LW_LIMIT_LOW, 520, 300, 0, 4 },
-    /* MW */ { 520, 1710, 1476, 3, 4 },
-    /* SW */ { SW_LIMIT_LOW, SW_LIMIT_HIGH, SW_LIMIT_LOW, 0, 4 },
-    /* FM */ { 6400, 10800, 8400, 1, 0 },
+    { "LW  ", LW_BAND_TYPE, 153, 520, 300, 0, 4 },
+    { "MW  ", MW_BAND_TYPE, 520, 1710, 1476, 3, 4 },
+    { "SW  ", SW_BAND_TYPE, SW_LIMIT_LOW, SW_LIMIT_HIGH, SW_LIMIT_LOW, 0, 4 },
+    { "160m", SW_BAND_TYPE, 1710, 2000, 1750, 0, 4 },
+    { "JP  ", FM_BAND_TYPE, 6400, 8400, 6400, 1, 0 }, /* FMJP */
+    { "EU  ", FM_BAND_TYPE, 8400, 10800, 8400, 1, 0 }, /* FMEU */
 };
 
-uint16_t SWSubBands[] =
-{
-    SW_LIMIT_LOW,  // 160 Meter
-    3500, // 80 Meter
-    4500, 
-    5600,
-    6800, // 40 Meter
-    7200, // 41 Meter
-    8500, 
-    10000, // 30 Meter
-    11200,
-    13400, 
-    14000, // 20 Meter
-    15000,
-    17200, 
-    18000, // 17 Meter
-    21000, // 15 Meter
-    21400, // 13 Meter
-    24890, // 12 Meter
-    CB_LIMIT_LOW, // CB Band (11 Meter)
-    CB_LIMIT_HIGH  // 10 Meter
-};
-const uint8_t g_SWSubBandCount = sizeof(SWSubBands) / sizeof(uint16_t);
+// uint16_t SWSubBands[] =
+// {
+//    SW_LIMIT_LOW,  // 160 Meter
+//    3500, // 80 Meter
+//    4500, 
+//    5600,
+//    6800, // 40 Meter
+//    7200, // 41 Meter
+//    8500, 
+//    10000, // 30 Meter
+//    11200,
+//    13400, 
+//    14000, // 20 Meter
+//    15000,
+//    17200, 
+//    18000, // 17 Meter
+//    21000, // 15 Meter
+//    21400, // 13 Meter
+//    24890, // 12 Meter
+//    CB_LIMIT_LOW, // CB Band (11 Meter)
+//    CB_LIMIT_HIGH  // 10 Meter
+// };
+// const uint8_t g_SWSubBandCount = sizeof(SWSubBands) / sizeof(uint16_t);
 const uint8_t g_lastBand = (sizeof(g_bandList) / sizeof(Band)) - 1;
 int8_t g_bandIndex = 1;
 
