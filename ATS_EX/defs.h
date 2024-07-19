@@ -19,7 +19,8 @@
 #define STORE_TIME 10000 // Inactive time to save our settings
 
 // OLED Const values
-#define DEFAULT_FONT FONT8X16POB
+//#define DEFAULT_FONT FONT8X16PO
+#define DEFAULT_FONT FONT8X16P
 #define RST_PIN -1
 #define RESET_PIN 12
 
@@ -52,8 +53,8 @@
 #define SW_LIMIT_LOW		1710
 #define SW_LIMIT_HIGH		30000
 //#define LW_LIMIT_LOW		153
-#define CB_LIMIT_LOW		26200
-#define CB_LIMIT_HIGH		28000
+//#define CB_LIMIT_LOW		26200
+//#define CB_LIMIT_HIGH		28000
 
 #define BAND_DELAY                 2
 #define VOLUME_DELAY               1 

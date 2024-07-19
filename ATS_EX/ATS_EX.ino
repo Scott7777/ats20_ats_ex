@@ -13,7 +13,11 @@
 #include <SI4735.h>
 #include <EEPROM.h>
 #include <Tiny4kOLED.h>
-#include <PixelOperatorBold.h> 
+//#include <PixelOperatorBold.h> 
+//#include <PixelOperator.h> 
+//#include <formplex12_font.h>
+//#include <font8x16atari.h>
+
 
 #include "font14x24sevenSeg.h"
 #include "Rotary.h"
@@ -100,9 +104,9 @@ void setup()
     else
     {
         oledPrint(" ATS-20 RECEIVER", 0, 0, DEFAULT_FONT, true);
-        oledPrint("ATS_EX v1.18", 16, 2);
-        oledPrint("Goshante 2024", 12, 4);
-        oledPrint("Best firmware", 12, 6);
+        oledPrint("ATS_EX v1.18s", 16, 2, DEFAULT_FONT);
+        oledPrint("Goshante 2024", 12, 4, DEFAULT_FONT);
+        oledPrint("Best firmware", 12, 6, DEFAULT_FONT);
         delay(2000);
     }
     oled.clear();
@@ -696,7 +700,10 @@ void showBandTag()
     if (g_sMeterOn || g_displayRDS)
         return;
 
-    oledPrint((g_currentFrequency >= CB_LIMIT_LOW && g_currentFrequency < CB_LIMIT_HIGH)? "CB" : g_bandList[g_bandIndex].bandTag, 0, 6, DEFAULT_FONT, g_cmdBand && g_currentMode != FM);
+    //oledPrint((g_currentFrequency >= CB_LIMIT_LOW && g_currentFrequency < CB_LIMIT_HIGH)? "CB" : bandTags[g_bandIndex], 0, 6, DEFAULT_FONT, g_cmdBand && g_currentMode != FM);
+    oledPrint("   ", 0, 6, DEFAULT_FONT, 0);
+    //oledPrint("   ", 0, 6);
+    oledPrint(bandTags[g_bandIndex], 0, 6, DEFAULT_FONT, g_cmdBand && g_currentMode != FM);
 }
 
 //Draw volume level
@@ -913,6 +920,7 @@ void showStep()
 
     uint8_t off = 50;
     oledPrint("St:", off - 16, 6, DEFAULT_FONT, g_cmdStep);
+    oledPrint("    ", off + 8, 6, DEFAULT_FONT, g_cmdStep);
     oledPrint(buf, off + 8, 6, DEFAULT_FONT, g_cmdStep);
 }
 
@@ -954,7 +962,7 @@ void showBandwidth()
     {
         bw = (char*)g_bandwidthFM[g_bwIndexFM];
     }
-
+    oledPrint("    ", 45, 0, DEFAULT_FONT, g_cmdBw);
     oledPrint(bw, 45, 0, DEFAULT_FONT, g_cmdBw);
 }
 

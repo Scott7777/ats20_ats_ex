@@ -163,9 +163,9 @@ char* g_bandwidthFM[] =
 {
     "AUTO",
     "110k",
-    " 84k",
-    " 60k",
-    " 40k"
+    "84k",
+    "60k",
+    "40k"
 };
 
 int g_tabStep[] =
@@ -211,7 +211,6 @@ enum BandType : uint8_t
 
 struct Band
 {
-    const char* bandTag;
     uint8_t bandType;         // Band type (FM, MW or SW)
     uint16_t minimumFreq;     // Minimum frequency of the band
     uint16_t maximumFreq;     // Maximum frequency of the band
@@ -234,22 +233,34 @@ char* g_RDSCells[3];
 
 char _literal_EmptyLine[17] = "                ";
 
-//char* bandTags[] =
-//{
-//    "LW",
-//    "MW",
-//    "SW",
-//    "  ",    //It looks better
-//};
+char* bandTags[] =
+{
+    "LW ",
+    "MW ",
+    "SW ",
+    "160",
+    "80 ",
+    "40 ",
+    "20 ",
+    "CB ",
+    "10 ",
+    "   ",
+    "   ",    //It looks better
+};
 
 Band g_bandList[] =
 {
-    { "LW  ", LW_BAND_TYPE, 153, 520, 300, 0, 4 },
-    { "MW  ", MW_BAND_TYPE, 520, 1710, 1476, 3, 4 },
-    { "SW  ", SW_BAND_TYPE, SW_LIMIT_LOW, SW_LIMIT_HIGH, SW_LIMIT_LOW, 0, 4 },
-    { "160m", SW_BAND_TYPE, 1710, 2000, 1750, 0, 4 },
-    { "JP  ", FM_BAND_TYPE, 6400, 8400, 6400, 1, 0 }, /* FMJP */
-    { "EU  ", FM_BAND_TYPE, 8400, 10800, 8400, 1, 0 }, /* FMEU */
+    { LW_BAND_TYPE, 153, 520, 225, 0, 4 },
+    { MW_BAND_TYPE, 520, 1710, 1476, 3, 4 },
+    { SW_BAND_TYPE, SW_LIMIT_LOW, SW_LIMIT_HIGH, SW_LIMIT_LOW, 0, 4 },
+    { SW_BAND_TYPE, 1710, 2000, 1750, 0, 4 },  // 160 meters
+    { SW_BAND_TYPE, 3500, 4500, 3700, 0, 4 },  // 80 meters
+    { SW_BAND_TYPE, 6800, 7300, 7100, 0, 4 },  // 40 meters
+    { SW_BAND_TYPE, 14000, 14500, 14200, 0, 4 },  // 20 meters
+    { SW_BAND_TYPE, 26200, 28000, 27180, 3, 4 },  // CB band (11 meters)
+    { SW_BAND_TYPE, 28000, 30000, 28400, 0, 4 },  // 10 meters
+    { FM_BAND_TYPE, 6400, 8400, 6400, 1, 0 }, /* FMJP */
+    { FM_BAND_TYPE, 8400, 10800, 8400, 1, 0 }, /* FMEU */
 };
 
 // uint16_t SWSubBands[] =
